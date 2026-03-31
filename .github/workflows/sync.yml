@@ -1,0 +1,28 @@
+name: Upstream Sync
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 每天 UTC 0:00 执行，可自定义
+  workflow_dispatch:     # 允许手动触发工作流
+
+jobs:
+  sync_with_upstream:
+    name: Sync with Upstream
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }} # 确保只在 Fork 的仓库中运行
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+
+      - name: Sync Upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          upstream_sync_repo: '/ChinaSiro/claude-code-sourcemap' # 请替换为原项目路径
+          upstream_sync_branch: main                             # 请替换为原项目主分支名
+          target_sync_branch: main                               # 请替换为你 Fork 仓库的主分支名
+          test_mode: false
